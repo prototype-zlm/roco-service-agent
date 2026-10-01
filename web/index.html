@@ -1,0 +1,3219 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-theme="night">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>洛克助手 · 洛克王国世界 AI 图鉴</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* =========================
+       Theme: 魔法星空夜
+    ========================= */
+
+    html[data-theme="night"] {
+        --bg: #0b0e2a;
+        --bg-grad:
+            radial-gradient(1200px 600px at 15% -10%, #2a1f5e 0%, transparent 60%),
+            radial-gradient(900px 500px at 95% 10%, #10406b 0%, transparent 55%),
+            linear-gradient(180deg, #0b0e2a 0%, #0a1234 55%, #070a1f 100%);
+
+        --sidebar-bg: linear-gradient(180deg, #141a45 0%, #0e1132 100%);
+        --sidebar-text: #e6e9ff;
+        --sidebar-muted: #8f97cf;
+        --sidebar-border: rgba(255, 212, 94, 0.18);
+        --sidebar-hover: rgba(255, 212, 94, 0.1);
+        --sidebar-active: rgba(122, 200, 255, 0.16);
+
+        --panel: rgba(255, 255, 255, 0.055);
+        --panel-solid: #161c47;
+        --panel-hover: rgba(255, 255, 255, 0.1);
+        --border: rgba(160, 180, 255, 0.16);
+
+        --text: #eef1ff;
+        --muted: #a3abd8;
+
+        --gold: #ffd45e;
+        --gold-soft: rgba(255, 212, 94, 0.35);
+        --accent: #6ad0ff;
+        --accent-2: #b98bff;
+
+        --user-bubble: linear-gradient(135deg, rgba(106, 208, 255, 0.16), rgba(185, 139, 255, 0.14));
+        --bot-bubble: rgba(255, 255, 255, 0.055);
+        --code-bg: rgba(0, 0, 0, 0.28);
+
+        --shadow: 0 12px 34px rgba(0, 0, 0, 0.45);
+        --star-opacity: 1;
+        --cloud-opacity: 0;
+        --hero-glow: rgba(122, 200, 255, 0.34);
+    }
+
+    /* =========================
+       Theme: 清新森林日
+    ========================= */
+
+    html[data-theme="day"] {
+        --bg: #eef8ee;
+        --bg-grad:
+            radial-gradient(1100px 520px at 10% -12%, #cdeed6 0%, transparent 62%),
+            radial-gradient(900px 480px at 92% 0%, #cfe9ff 0%, transparent 58%),
+            linear-gradient(180deg, #f2fbf2 0%, #e8f6ee 60%, #e2f2e6 100%);
+
+        --sidebar-bg: linear-gradient(180deg, #24503a 0%, #1a3b2b 100%);
+        --sidebar-text: #f2fff6;
+        --sidebar-muted: #a9d6bb;
+        --sidebar-border: rgba(255, 176, 58, 0.28);
+        --sidebar-hover: rgba(255, 255, 255, 0.1);
+        --sidebar-active: rgba(255, 176, 58, 0.2);
+
+        --panel: rgba(255, 255, 255, 0.85);
+        --panel-solid: #ffffff;
+        --panel-hover: #ffffff;
+        --border: rgba(46, 112, 74, 0.16);
+
+        --text: #1d3326;
+        --muted: #5d7a68;
+
+        --gold: #f0980f;
+        --gold-soft: rgba(240, 152, 15, 0.3);
+        --accent: #2fa46c;
+        --accent-2: #3f8fd6;
+
+        --user-bubble: linear-gradient(135deg, rgba(47, 164, 108, 0.14), rgba(63, 143, 214, 0.12));
+        --bot-bubble: #ffffff;
+        --code-bg: rgba(46, 112, 74, 0.07);
+
+        --shadow: 0 10px 28px rgba(31, 79, 52, 0.14);
+        --star-opacity: 0;
+        --cloud-opacity: 1;
+        --hero-glow: rgba(255, 190, 90, 0.4);
+    }
+
+    :root {
+        --sidebar-w: 268px;
+        --radius: 16px;
+    }
+
+    body {
+        height: 100vh;
+        font-family:
+            "HarmonyOS Sans SC",
+            "Nunito",
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI Variable",
+            "Segoe UI",
+            "PingFang SC",
+            "Microsoft YaHei UI",
+            "Microsoft YaHei",
+            sans-serif;
+        color: var(--text);
+        background: var(--bg);
+        background-image: var(--bg-grad);
+        overflow: hidden;
+        transition: background-color 0.45s ease, color 0.3s ease;
+    }
+
+    /* =========================
+       背景装饰层
+    ========================= */
+
+    .bg-decor {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        overflow: hidden;
+    }
+
+    /* 星空（夜） */
+    .stars {
+        position: absolute;
+        inset: 0;
+        opacity: var(--star-opacity);
+        transition: opacity 0.6s ease;
+        background-image:
+            radial-gradient(1.6px 1.6px at 12% 18%, #fff 50%, transparent 51%),
+            radial-gradient(1.4px 1.4px at 28% 62%, #ffe9a8 50%, transparent 51%),
+            radial-gradient(1.8px 1.8px at 47% 12%, #fff 50%, transparent 51%),
+            radial-gradient(1.2px 1.2px at 63% 45%, #cfe6ff 50%, transparent 51%),
+            radial-gradient(2px 2px at 78% 22%, #fff 50%, transparent 51%),
+            radial-gradient(1.4px 1.4px at 88% 68%, #ffd9f2 50%, transparent 51%),
+            radial-gradient(1.3px 1.3px at 36% 84%, #fff 50%, transparent 51%),
+            radial-gradient(1.7px 1.7px at 70% 90%, #ffe9a8 50%, transparent 51%),
+            radial-gradient(1.2px 1.2px at 8% 46%, #cfe6ff 50%, transparent 51%),
+            radial-gradient(1.5px 1.5px at 55% 70%, #fff 50%, transparent 51%);
+        animation: twinkle 4.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes twinkle {
+        from { opacity: calc(var(--star-opacity) * 0.45); }
+        to   { opacity: var(--star-opacity); }
+    }
+
+    /* 光雾（两个主题共用，颜色由变量决定） */
+    .aurora {
+        position: absolute;
+        width: 60vw;
+        height: 60vw;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.35;
+    }
+
+    .aurora.a1 {
+        top: -22vw;
+        left: -12vw;
+        background: var(--accent-2);
+        animation: drift 22s ease-in-out infinite alternate;
+    }
+
+    .aurora.a2 {
+        bottom: -26vw;
+        right: -14vw;
+        background: var(--accent);
+        animation: drift 18s ease-in-out infinite alternate-reverse;
+    }
+
+    @keyframes drift {
+        from { transform: translate3d(0, 0, 0) scale(1); }
+        to   { transform: translate3d(4vw, 3vw, 0) scale(1.12); }
+    }
+
+    /* 云朵 / 叶片（日） */
+    .clouds {
+        position: absolute;
+        inset: 0;
+        opacity: var(--cloud-opacity);
+        transition: opacity 0.6s ease;
+        background-image:
+            radial-gradient(60px 26px at 18% 22%, rgba(255,255,255,0.9) 60%, transparent 61%),
+            radial-gradient(44px 20px at 24% 25%, rgba(255,255,255,0.85) 60%, transparent 61%),
+            radial-gradient(70px 30px at 76% 14%, rgba(255,255,255,0.9) 60%, transparent 61%),
+            radial-gradient(50px 22px at 83% 17%, rgba(255,255,255,0.8) 60%, transparent 61%);
+        animation: floatCloud 26s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatCloud {
+        from { transform: translateX(-2vw); }
+        to   { transform: translateX(3vw); }
+    }
+
+    /* 世界地图瓦片，作为极淡的地面纹理 */
+    .map-tile {
+        position: absolute;
+        inset: 0;
+        background-image: url("https://wiki-dev-patch-oss.oss-cn-hangzhou.aliyuncs.com/res/lkwg/S3/tiles-G/5/tile-0_0.png");
+        background-size: 256px 256px;
+        background-repeat: repeat;
+        opacity: 0.05;
+        mix-blend-mode: luminosity;
+    }
+
+    /* =========================
+       Layout
+    ========================= */
+
+    .app {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        width: 100%;
+        height: 100vh;
+    }
+
+    /* =========================
+       Sidebar
+    ========================= */
+
+    .sidebar {
+        width: var(--sidebar-w);
+        height: 100%;
+        background: var(--sidebar-bg);
+        color: var(--sidebar-text);
+        display: flex;
+        flex-direction: column;
+        padding: 16px 14px;
+        flex-shrink: 0;
+        border-right: 1px solid var(--sidebar-border);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.22);
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* 侧栏底部的精灵剪影 */
+    .sidebar::after {
+        content: "";
+        position: absolute;
+        right: -18px;
+        bottom: 74px;
+        width: 150px;
+        height: 150px;
+        background-image: url("https://patchwiki.biligame.com/images/rocom/thumb/8/84/boqwe6u97r8unsy5mzakw5zkfdbszob.png/180px-JL_huoshen.png");
+        background-size: contain;
+        background-repeat: no-repeat;
+        opacity: 0.13;
+        pointer-events: none;
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4px 0 16px;
+    }
+
+    .brand img {
+        width: 168px;
+        max-width: 100%;
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+    }
+
+    .brand-fallback {
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: 2px;
+        color: var(--gold);
+    }
+
+    .new-chat {
+        width: 100%;
+        height: 46px;
+        border: 1px solid var(--gold-soft);
+        border-radius: 13px;
+        background: linear-gradient(135deg, rgba(255, 212, 94, 0.18), rgba(255, 255, 255, 0.05));
+        color: var(--sidebar-text);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 14px;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 600;
+        transition: transform 0.12s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .new-chat:hover {
+        background: linear-gradient(135deg, rgba(255, 212, 94, 0.3), rgba(255, 255, 255, 0.09));
+        box-shadow: 0 0 0 3px var(--gold-soft), 0 8px 18px rgba(0, 0, 0, 0.28);
+        transform: translateY(-1px);
+    }
+
+    .new-chat:active {
+        transform: translateY(1px) scale(0.985);
+    }
+
+    .plus {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--gold);
+        color: #2a1c00;
+        font-size: 17px;
+        font-weight: 700;
+        line-height: 21px;
+        text-align: center;
+        flex-shrink: 0;
+    }
+
+    .sidebar-section {
+        margin-top: 22px;
+        min-height: 0;
+        /* 只设 overflow-y 时，overflow-x 的 visible 会被计算成 auto，
+           会话项 hover 的 translateX(2px) 就会冒出一条水平滚动条 */
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    .sidebar-title {
+        color: var(--sidebar-muted);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        padding: 0 10px 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .sidebar-title::before {
+        content: "";
+        width: 12px;
+        height: 12px;
+        background: var(--gold);
+        clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+        flex-shrink: 0;
+    }
+
+    .conversation {
+        width: 100%;
+        padding: 11px 12px;
+        border-radius: 11px;
+        cursor: pointer;
+        font-size: 14px;
+        color: var(--sidebar-text);
+        border: 1px solid transparent;
+        transition: background 0.18s ease, border-color 0.18s ease, transform 0.12s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* 省略号挪到内层，父级要留给 flex 布局 */
+    .conversation-title {
+        flex: 1;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .conversation-delete {
+        flex-shrink: 0;
+        width: 22px;
+        height: 22px;
+        padding: 0;
+        border: none;
+        border-radius: 6px;
+        background: transparent;
+        color: var(--sidebar-muted);
+        font-size: 16px;
+        line-height: 1;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+    }
+
+    .conversation:hover .conversation-delete,
+    .conversation-delete:focus-visible {
+        opacity: 1;
+    }
+
+    .conversation-delete:hover {
+        background: var(--sidebar-hover);
+        color: #ff8a8a;
+    }
+
+    .conversation-delete[disabled] {
+        opacity: 0.5;
+        cursor: default;
+    }
+
+    .conversation + .conversation {
+        margin-top: 4px;
+    }
+
+    .conversation:hover {
+        background: var(--sidebar-hover);
+        transform: translateX(2px);
+    }
+
+    .conversation.active {
+        background: var(--sidebar-active);
+        border-color: var(--sidebar-border);
+        font-weight: 600;
+    }
+
+    .conversation-empty {
+        padding: 11px 12px;
+        font-size: 13px;
+        color: var(--sidebar-muted);
+    }
+
+
+    .sidebar-footer {
+        margin-top: auto;
+        border-top: 1px solid var(--sidebar-border);
+        padding-top: 14px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 8px;
+        border-radius: 12px;
+        transition: background 0.18s ease;
+    }
+
+    .user-info:hover {
+        background: var(--sidebar-hover);
+    }
+
+    .avatar-small {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--gold), #ff9f43);
+        color: #2a1c00;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        font-weight: 800;
+        flex-shrink: 0;
+        box-shadow: 0 0 0 2px var(--gold-soft);
+    }
+
+    .user-name {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .user-rank {
+        font-size: 11px;
+        color: var(--sidebar-muted);
+        margin-top: 2px;
+    }
+
+    /* =========================
+       Main
+    ========================= */
+
+    .main {
+        flex: 1;
+        min-width: 0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* =========================
+       Header
+    ========================= */
+
+    .header {
+        height: 78px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 26px;
+        flex-shrink: 0;
+        position: relative;
+        overflow: hidden;
+        background: var(--panel);
+        backdrop-filter: blur(10px);
+    }
+
+    /* 顶部横幅图（S3 赛季宣传图）作为极淡底纹 */
+    .header::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: url("https://patchwiki.biligame.com/images/rocom/3/32/rfqecc9kp0xhie3q1jl0yxryzbyqmz5.png");
+        background-size: cover;
+        background-position: center 30%;
+        opacity: 0.16;
+        pointer-events: none;
+    }
+
+    .header::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--gold), var(--accent), transparent);
+        opacity: 0.7;
+    }
+
+    .agent-info {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        position: relative;
+    }
+
+    .agent-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 14px;
+        background: var(--panel-solid);
+        border: 2px solid var(--gold-soft);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        flex-shrink: 0;
+        box-shadow: 0 0 16px var(--hero-glow);
+    }
+
+    .agent-avatar img {
+        width: 46px;
+        height: 46px;
+        object-fit: contain;
+        animation: bob 3.4s ease-in-out infinite;
+    }
+
+    @keyframes bob {
+        0%, 100% { transform: translateY(0); }
+        50%      { transform: translateY(-3px); }
+    }
+
+    .agent-name {
+        font-size: 17px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+    }
+
+    .agent-name span {
+        color: var(--gold);
+    }
+
+    .agent-status {
+        margin-top: 4px;
+        font-size: 12px;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        background: #9aa0b5;
+    }
+
+    .status-dot.online {
+        background: #34d399;
+        animation: pulse 2s infinite;
+    }
+
+    .status-dot.checking {
+        background: #f5b73d;
+        animation: blink 1s ease-in-out infinite alternate;
+    }
+
+    .status-dot.offline {
+        background: #ef4444;
+    }
+
+    @keyframes pulse {
+        0%   { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.6); }
+        70%  { box-shadow: 0 0 0 7px rgba(52, 211, 153, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+    }
+
+    @keyframes blink {
+        from { opacity: 0.3; }
+        to   { opacity: 1; }
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        position: relative;
+    }
+
+    .icon-button {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: var(--panel);
+        color: var(--text);
+        cursor: pointer;
+        font-size: 18px;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.12s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .icon-button:hover {
+        background: var(--panel-hover);
+        box-shadow: 0 0 0 3px var(--gold-soft);
+        transform: translateY(-1px);
+    }
+
+    .icon-button:active {
+        transform: translateY(1px) scale(0.94);
+    }
+
+    .icon-button.off {
+        opacity: 0.45;
+    }
+
+    /* =========================
+       Chat Area
+    ========================= */
+
+    .chat-container {
+        flex: 1;
+        overflow-y: auto;
+        padding: 30px 20px 180px;
+        scrollbar-width: thin;
+    }
+
+    .chat-container::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    .chat-container::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 10px;
+    }
+
+    .chat-content {
+        width: min(860px, 100%);
+        margin: 0 auto;
+    }
+
+    /* =========================
+       Welcome
+    ========================= */
+
+    .welcome {
+        min-height: 56vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    .hero {
+        position: relative;
+        width: 100%;
+        height: 168px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        margin-bottom: 14px;
+    }
+
+    .hero::before {
+        content: "";
+        position: absolute;
+        bottom: 6px;
+        width: 260px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--hero-glow);
+        filter: blur(26px);
+    }
+
+    .hero img {
+        object-fit: contain;
+        position: relative;
+        filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.32));
+    }
+
+    .hero .pet-main {
+        width: 132px;
+        height: 132px;
+        animation: bob 3.2s ease-in-out infinite;
+        z-index: 2;
+    }
+
+    .hero .pet-side {
+        width: 86px;
+        height: 86px;
+        opacity: 0.92;
+    }
+
+    .hero .pet-left {
+        margin-right: -14px;
+        animation: bob 3.8s ease-in-out infinite 0.4s;
+    }
+
+    .hero .pet-right {
+        margin-left: -14px;
+        animation: bob 4.2s ease-in-out infinite 0.8s;
+    }
+
+    .welcome h1 {
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+    }
+
+    .welcome h1 em {
+        font-style: normal;
+        color: var(--gold);
+    }
+
+    .welcome p {
+        color: var(--muted);
+        font-size: 14px;
+        max-width: 500px;
+        line-height: 1.85;
+    }
+
+    /* 属性图例 */
+    .type-legend {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px;
+        width: min(660px, 100%);
+        margin-top: 22px;
+    }
+
+    .type-legend-title {
+        width: 100%;
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 2px;
+        letter-spacing: 1px;
+    }
+
+    .type-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #fff;
+        background: var(--chip, #888);
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        white-space: nowrap;
+    }
+
+    button.type-chip {
+        cursor: pointer;
+        font-family: inherit;
+        transition: transform 0.12s ease, box-shadow 0.18s ease;
+    }
+
+    button.type-chip:hover {
+        transform: translateY(-2px) scale(1.06);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    }
+
+    button.type-chip:active {
+        transform: translateY(0) scale(0.96);
+    }
+
+    /* 消息正文里的属性徽章 */
+    .message-content .type-chip {
+        margin: 0 1px;
+        padding: 1px 8px;
+        font-size: 12px;
+        vertical-align: 1px;
+    }
+
+    /* 建议卡片 */
+    .suggestions {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 11px;
+        width: min(660px, 100%);
+        margin-top: 26px;
+    }
+
+    .suggestion {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 13px 14px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: var(--panel);
+        backdrop-filter: blur(6px);
+        text-align: left;
+        cursor: pointer;
+        font: inherit;
+        font-size: 13px;
+        color: var(--text);
+        transition: transform 0.14s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .suggestion:hover {
+        border-color: var(--gold-soft);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18), 0 0 0 3px var(--gold-soft);
+        transform: translateY(-2px);
+    }
+
+    .suggestion:active {
+        transform: translateY(0) scale(0.985);
+    }
+
+    .suggestion img {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+        flex-shrink: 0;
+    }
+
+    /* =========================
+       Messages
+    ========================= */
+
+    .message {
+        display: flex;
+        gap: 13px;
+        margin-bottom: 24px;
+        animation: popIn 0.28s cubic-bezier(0.22, 1.2, 0.4, 1);
+    }
+
+    .message-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 16px;
+        font-weight: 800;
+        overflow: hidden;
+        border: 2px solid var(--border);
+        background: var(--panel-solid);
+    }
+
+    .message.user .message-avatar {
+        background: linear-gradient(135deg, var(--gold), #ff9f43);
+        color: #2a1c00;
+        border-color: var(--gold-soft);
+    }
+
+    .message.assistant .message-avatar {
+        border-color: var(--gold-soft);
+        box-shadow: 0 0 12px var(--hero-glow);
+    }
+
+    .message.assistant .message-avatar img {
+        width: 38px;
+        height: 38px;
+        object-fit: contain;
+    }
+
+    .message-body {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .message-role {
+        font-size: 12.5px;
+        font-weight: 700;
+        margin-bottom: 6px;
+        color: var(--muted);
+        letter-spacing: 0.5px;
+    }
+
+    .message-content {
+        font-size: 14.5px;
+        line-height: 1.85;
+        white-space: pre-wrap;
+        word-break: break-word;
+        padding: 13px 16px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: var(--bot-bubble);
+        box-shadow: var(--shadow);
+    }
+
+    .message.user .message-content {
+        background: var(--user-bubble);
+        border-color: var(--gold-soft);
+    }
+
+    .message.assistant .message-content {
+        border-left: 3px solid var(--gold);
+        /* markdown 渲染出的是块级结构，pre-wrap 会让换行和 margin 叠成双倍间距 */
+        white-space: normal;
+    }
+
+    /* =========================
+       Markdown 排版
+    ========================= */
+
+    .message-content > *:first-child {
+        margin-top: 0;
+    }
+
+    .message-content > *:last-child {
+        margin-bottom: 0;
+    }
+
+    .message-content p {
+        margin: 0 0 10px;
+    }
+
+    .message-content h1,
+    .message-content h2,
+    .message-content h3,
+    .message-content h4 {
+        margin: 16px 0 8px;
+        line-height: 1.5;
+        font-weight: 700;
+    }
+
+    .message-content h1 { font-size: 18px; }
+    .message-content h2 { font-size: 16.5px; }
+    .message-content h3 { font-size: 15.5px; }
+
+    .message-content h4 {
+        font-size: 14.5px;
+        color: var(--muted);
+    }
+
+    .message-content ul,
+    .message-content ol {
+        margin: 0 0 10px;
+        padding-left: 22px;
+    }
+
+    .message-content li {
+        margin: 3px 0;
+    }
+
+    .message-content blockquote {
+        margin: 10px 0;
+        padding: 8px 13px;
+        border-left: 3px solid var(--gold-soft);
+        border-radius: 0 9px 9px 0;
+        background: var(--code-bg);
+        color: var(--muted);
+    }
+
+    .message-content code {
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Courier New", monospace;
+        font-size: 13px;
+        padding: 1px 5px;
+        border-radius: 5px;
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+    }
+
+    .message-content pre {
+        margin: 10px 0;
+        padding: 11px 13px;
+        border-radius: 10px;
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        overflow-x: auto;
+    }
+
+    .message-content pre code {
+        padding: 0;
+        border: none;
+        background: none;
+        white-space: pre;
+    }
+
+    .message-content hr {
+        margin: 14px 0;
+        border: none;
+        border-top: 1px solid var(--border);
+    }
+
+    .message-content a {
+        color: var(--gold);
+        text-decoration: underline;
+    }
+
+    .message-content table {
+        /* display: block 是为了让宽表格能横向滚动而不撑破气泡 */
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+        margin: 10px 0;
+        border-collapse: collapse;
+        font-size: 13.5px;
+    }
+
+    .message-content th,
+    .message-content td {
+        padding: 6px 11px;
+        border: 1px solid var(--border);
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    .message-content th {
+        background: var(--code-bg);
+        font-weight: 700;
+    }
+
+
+    @keyframes popIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px) scale(0.98);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    /* =========================
+       Typing
+    ========================= */
+
+    .typing {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 15px 18px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--gold);
+        background: var(--bot-bubble);
+    }
+
+    .typing span {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--gold);
+        animation: typing 1.2s infinite ease-in-out;
+    }
+
+    .typing span:nth-child(2) {
+        background: var(--accent);
+        animation-delay: 0.15s;
+    }
+
+    .typing span:nth-child(3) {
+        background: var(--accent-2);
+        animation-delay: 0.3s;
+    }
+
+    @keyframes typing {
+        0%, 60%, 100% {
+            transform: translateY(0) scale(0.9);
+            opacity: 0.45;
+        }
+        30% {
+            transform: translateY(-6px) scale(1.15);
+            opacity: 1;
+        }
+    }
+
+    /* =========================
+       Input
+    ========================= */
+
+    .input-area {
+        position: fixed;
+        bottom: 0;
+        left: var(--sidebar-w);
+        right: 0;
+        padding: 18px 20px 24px;
+        z-index: 2;
+        background: linear-gradient(to top, var(--bg) 62%, transparent);
+    }
+
+    .input-wrapper {
+        width: min(860px, 100%);
+        margin: 0 auto;
+        position: relative;
+    }
+
+    .input-box {
+        background: var(--panel-solid);
+        border: 2px solid var(--border);
+        border-radius: 18px;
+        min-height: 62px;
+        display: flex;
+        align-items: flex-end;
+        padding: 12px 62px 12px 18px;
+        box-shadow: var(--shadow);
+        transition: border-color 0.2s ease, box-shadow 0.25s ease;
+    }
+
+    .input-box:focus-within {
+        border-color: var(--gold);
+        box-shadow: var(--shadow), 0 0 0 4px var(--gold-soft);
+    }
+
+    textarea {
+        width: 100%;
+        max-height: 170px;
+        border: none;
+        outline: none;
+        resize: none;
+        background: transparent;
+        font: inherit;
+        font-size: 14.5px;
+        line-height: 1.65;
+        color: var(--text);
+    }
+
+    textarea::placeholder {
+        color: var(--muted);
+    }
+
+    .send-button {
+        position: absolute;
+        right: 11px;
+        bottom: 11px;
+        width: 42px;
+        height: 42px;
+        border: none;
+        border-radius: 13px;
+        background: linear-gradient(135deg, var(--gold), #ff9f43);
+        color: #2a1c00;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 14px var(--gold-soft);
+        transition: transform 0.12s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    }
+
+    .send-button:hover:not(:disabled) {
+        transform: translateY(-2px) rotate(-6deg);
+        box-shadow: 0 8px 20px var(--gold-soft);
+    }
+
+    .send-button:active:not(:disabled) {
+        transform: scale(0.9);
+    }
+
+    .send-button:disabled {
+        background: var(--panel);
+        color: var(--muted);
+        box-shadow: none;
+        cursor: not-allowed;
+    }
+
+    .send-icon {
+        width: 18px;
+        height: 18px;
+    }
+
+    .input-tip {
+        text-align: center;
+        color: var(--muted);
+        font-size: 11.5px;
+        margin-top: 9px;
+        letter-spacing: 0.3px;
+    }
+
+    /* =========================
+       Mobile
+    ========================= */
+
+    @media (max-width: 700px) {
+        .sidebar {
+            display: none;
+        }
+
+        .header {
+            padding: 0 14px;
+            height: 68px;
+        }
+
+        .agent-avatar {
+            width: 42px;
+            height: 42px;
+        }
+
+        .agent-avatar img {
+            width: 38px;
+            height: 38px;
+        }
+
+        .input-area {
+            left: 0;
+            padding: 12px 12px 18px;
+        }
+
+        .chat-container {
+            padding-left: 14px;
+            padding-right: 14px;
+        }
+
+        .suggestions {
+            grid-template-columns: 1fr;
+        }
+
+        .welcome h1 {
+            font-size: 24px;
+        }
+
+        .hero {
+            height: 132px;
+        }
+
+        .hero .pet-main {
+            width: 104px;
+            height: 104px;
+        }
+
+        .hero .pet-side {
+            width: 64px;
+            height: 64px;
+        }
+
+        .message {
+            gap: 10px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            animation: none !important;
+            transition: none !important;
+        }
+    }
+</style>
+
+</head>
+
+<body>
+
+<!-- 背景装饰 -->
+<div class="bg-decor" aria-hidden="true">
+    <div class="aurora a1"></div>
+    <div class="aurora a2"></div>
+    <div class="stars"></div>
+    <div class="clouds"></div>
+    <div class="map-tile"></div>
+</div>
+
+
+<div class="app">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <img
+                src="https://patchwiki.biligame.com/images/rocom/e/e4/pd01mne2ugswj9qumyujbjjxh5qqi5y.png"
+                alt="洛克王国世界"
+                onerror="this.outerHTML='<div class=&quot;brand-fallback&quot;>洛克王国 · 世界</div>'"
+            >
+        </div>
+
+        <button class="new-chat" id="newChat">
+            <span class="plus">+</span>
+            <span>新的冒险</span>
+        </button>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title">
+                冒险记录
+            </div>
+
+            <div id="conversationList"></div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-info" id="userInfo">
+                <div class="avatar-small">
+                    洛
+                </div>
+
+                <div>
+                    <div class="user-name">
+                        小洛克
+                    </div>
+
+                    <div class="user-rank">
+                        见习驯养师 · Lv.1
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </aside>
+
+
+    <!-- Main -->
+    <main class="main">
+
+        <!-- Header -->
+        <header class="header">
+
+            <div class="agent-info">
+
+                <div class="agent-avatar">
+                    <img
+                        src="https://patchwiki.biligame.com/images/rocom/thumb/2/2b/sw0puzl5c0n8hu49ryqk7drh1gxtblr.png/180px-JL_dimo.png"
+                        alt="迪莫"
+                        onerror="this.replaceWith(document.createTextNode('✦'))"
+                    >
+                </div>
+
+                <div>
+                    <div class="agent-name">
+                        洛克<span>助手</span>
+                    </div>
+
+                    <div class="agent-status">
+                        <span class="status-dot checking" id="statusDot"></span>
+                        <span id="statusText">正在连接图鉴…</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="header-actions">
+
+                <button
+                    class="icon-button"
+                    id="soundToggle"
+                    title="音效开关"
+                    aria-label="音效开关"
+                >
+                    🔔
+                </button>
+
+                <button
+                    class="icon-button"
+                    id="themeToggle"
+                    title="切换日 / 夜主题"
+                    aria-label="切换主题"
+                >
+                    ☀
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <!-- Chat -->
+        <div class="chat-container" id="chatContainer">
+
+            <div class="chat-content" id="chatContent">
+                <!-- 欢迎屏由 renderWelcome() 渲染 -->
+            </div>
+
+        </div>
+
+
+        <!-- Input -->
+        <div class="input-area">
+
+            <div class="input-wrapper">
+
+                <div class="input-box">
+
+                    <textarea
+                        id="input"
+                        rows="1"
+                        placeholder="问问洛克助手：属性克制、技能效果、进化链、图鉴数据……"
+                    ></textarea>
+
+                </div>
+
+                <button
+                    class="send-button"
+                    id="sendButton"
+                    title="发送"
+                >
+                    <svg
+                        class="send-icon"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+
+            </div>
+
+            <div class="input-tip">
+                Enter 发送 · Shift + Enter 换行
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+    const API_URL = "http://127.0.0.1:3000/api/chat";
+    const PROBE_URL = "http://127.0.0.1:3000/api/health";
+    const DELETE_URL = "http://127.0.0.1:3000/api/delete_messages";
+
+    const input = document.querySelector("#input");
+    const sendButton = document.querySelector("#sendButton");
+    const chatContent = document.querySelector("#chatContent");
+    const chatContainer = document.querySelector("#chatContainer");
+    const newChat = document.querySelector("#newChat");
+    const conversationList = document.querySelector("#conversationList");
+    const userInfo = document.querySelector("#userInfo");
+    const themeToggle = document.querySelector("#themeToggle");
+    const soundToggle = document.querySelector("#soundToggle");
+    const statusDot = document.querySelector("#statusDot");
+    const statusText = document.querySelector("#statusText");
+
+    let loading = false;
+
+
+    // =========================
+    // 身份与会话（localStorage）
+    //
+    // user_id：一台电脑（一个浏览器 origin）一个，首次访问生成后不再变。
+    // thread_id：一个会话一个，作为后端 LangGraph 的 configurable.thread_id。
+    //
+    // 消息内容在这里也存了一份，只是为了点开历史会话时能回显气泡。
+    // 后端 checkpointer 才是唯一权威来源；等后端提供了读取历史的接口，
+    // 这份本地副本就该删掉，避免两边不一致。
+    // =========================
+
+    const LS_USER = "roco.user_id";
+    const LS_THREADS = "roco.threads";
+    const LS_CURRENT = "roco.current_thread";
+    const LS_MESSAGES = "roco.messages.";
+
+    const MAX_THREADS = 30;
+    const MAX_MESSAGES = 100;
+
+
+    function uid() {
+
+        if (window.crypto && typeof crypto.randomUUID === "function") {
+            return crypto.randomUUID();
+        }
+
+        // file:// 或旧浏览器下 randomUUID 可能不可用
+        const bytes = new Uint8Array(16);
+
+        if (window.crypto && crypto.getRandomValues) {
+            crypto.getRandomValues(bytes);
+        } else {
+            for (let i = 0; i < bytes.length; i++) {
+                bytes[i] = Math.floor(Math.random() * 256);
+            }
+        }
+
+        return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+    }
+
+
+    function lsGet(key, fallback) {
+
+        try {
+            const raw = localStorage.getItem(key);
+
+            return raw === null ? fallback : JSON.parse(raw);
+
+        } catch (error) {
+            return fallback;
+        }
+    }
+
+
+    function lsSet(key, value) {
+
+        try {
+            localStorage.setItem(key, JSON.stringify(value));
+
+            return true;
+
+        } catch (error) {
+            console.warn("localStorage 写入失败（可能已满）", error);
+
+            return false;
+        }
+    }
+
+
+    const userId = (() => {
+
+        const saved = lsGet(LS_USER, null);
+
+        if (typeof saved === "string" && saved) {
+            return saved;
+        }
+
+        const created = uid();
+
+        lsSet(LS_USER, created);
+
+        return created;
+    })();
+
+
+    let threads = lsGet(LS_THREADS, []);
+
+    if (!Array.isArray(threads)) {
+        threads = [];
+    }
+
+    let currentThreadId = lsGet(LS_CURRENT, null);
+
+
+    function persistThreads() {
+
+        lsSet(LS_THREADS, threads);
+        lsSet(LS_CURRENT, currentThreadId);
+    }
+
+
+    function getMessages(threadId) {
+
+        const saved = lsGet(LS_MESSAGES + threadId, []);
+
+        return Array.isArray(saved) ? saved : [];
+    }
+
+
+    function recordMessage(role, content, threadId) {
+
+        const messages = getMessages(threadId);
+
+        messages.push({ role, content });
+
+        lsSet(
+            LS_MESSAGES + threadId,
+            messages.slice(-MAX_MESSAGES)
+        );
+
+        const thread = threads.find((item) => item.id === threadId);
+
+        if (thread) {
+
+            thread.updatedAt = Date.now();
+
+            // 首条用户提问作为会话标题
+            if (role === "user" && messages.length === 1) {
+                thread.title = titleFromMessage(content);
+            }
+
+            persistThreads();
+            renderConversations();
+        }
+    }
+
+
+    function titleFromMessage(text) {
+
+        const clean = text.replace(/\s+/g, " ").trim();
+
+        return clean.length > 18 ? clean.slice(0, 18) + "…" : clean;
+    }
+
+
+    function createThread() {
+
+        const thread = {
+            id: uid(),
+            title: "新的冒险",
+            updatedAt: Date.now()
+        };
+
+        threads.unshift(thread);
+
+        // 超出上限的老会话连同消息一起丢弃
+        if (threads.length > MAX_THREADS) {
+
+            threads
+                .slice(MAX_THREADS)
+                .forEach((old) => localStorage.removeItem(LS_MESSAGES + old.id));
+
+            threads = threads.slice(0, MAX_THREADS);
+        }
+
+        currentThreadId = thread.id;
+
+        persistThreads();
+
+        return thread;
+    }
+
+
+    // 发送前调用：保证 currentThreadId 一定指向一个存在的会话
+    function ensureThread() {
+
+        const existing = threads.find((item) => item.id === currentThreadId);
+
+        return existing || createThread();
+    }
+
+
+    function renderConversations() {
+
+        conversationList.textContent = "";
+
+        if (!threads.length) {
+
+            const empty = document.createElement("div");
+
+            empty.className = "conversation-empty";
+            empty.textContent = "还没有冒险记录";
+
+            conversationList.appendChild(empty);
+
+            return;
+        }
+
+        threads.forEach((thread) => {
+
+            const item = document.createElement("div");
+
+            item.className =
+                "conversation" + (thread.id === currentThreadId ? " active" : "");
+
+            const title = document.createElement("span");
+
+            title.className = "conversation-title";
+            title.textContent = thread.title;
+            title.title = thread.title;
+
+            const remove = document.createElement("button");
+
+            remove.type = "button";
+            remove.className = "conversation-delete";
+            remove.textContent = "×";
+            remove.title = "删除这条冒险记录";
+            remove.setAttribute("aria-label", "删除冒险记录：" + thread.title);
+
+            remove.addEventListener("click", (event) => {
+
+                // 否则会顺带触发外层的切换会话
+                event.stopPropagation();
+
+                deleteThread(thread.id, remove);
+            });
+
+            item.appendChild(title);
+            item.appendChild(remove);
+
+            item.addEventListener("click", () => {
+
+                switchThread(thread.id);
+
+                sfx.click();
+            });
+
+            conversationList.appendChild(item);
+        });
+    }
+
+
+    // 删除会话：后端确认成功才动本地数据，避免前端删了后端还留着
+    async function deleteThread(threadId, button) {
+
+        if (loading) {
+            return;
+        }
+
+        const thread = threads.find((item) => item.id === threadId);
+
+        if (!thread) {
+            return;
+        }
+
+        const confirmed = window.confirm(
+            `删除「${thread.title}」？这条冒险记录和洛克助手对它的记忆都会被清空，且无法恢复。`
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent = "…";
+
+        try {
+
+            const res = await fetch(DELETE_URL, {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    thread_id: threadId
+                })
+            });
+
+            let data = null;
+
+            try {
+                data = await res.json();
+            } catch (parseError) {
+                // 响应体不是 JSON
+            }
+
+            if (!res.ok || !data || data.success !== true) {
+                throw new Error((data && data.message) || `HTTP ${res.status}`);
+            }
+
+            threads = threads.filter((item) => item.id !== threadId);
+
+            localStorage.removeItem(LS_MESSAGES + threadId);
+
+            if (threadId === currentThreadId) {
+
+                // 删掉的是当前会话，落到剩下的第一条，一条不剩就新建
+                currentThreadId = threads.length ? threads[0].id : null;
+
+                ensureThread();
+                persistThreads();
+                renderConversations();
+                renderThread();
+
+            } else {
+
+                persistThreads();
+                renderConversations();
+            }
+
+            sfx.click();
+
+        } catch (error) {
+
+            console.error(error);
+
+            button.disabled = false;
+            button.textContent = "×";
+
+            sfx.error();
+
+            window.alert(
+                "删除失败（" + error.message + "）。\n" +
+                "后端没有确认成功，本地记录已保留，稍后再试。"
+            );
+        }
+    }
+
+
+
+    function switchThread(threadId) {
+
+        // 流式进行中切换会把后续 token 写进错误的会话
+        if (loading || threadId === currentThreadId) {
+            return;
+        }
+
+        currentThreadId = threadId;
+
+        persistThreads();
+        renderConversations();
+        renderThread();
+    }
+
+
+    // 按当前会话的本地消息重建聊天区
+    function renderThread() {
+
+        const messages = getMessages(currentThreadId);
+
+        if (!messages.length) {
+            renderWelcome();
+            return;
+        }
+
+        chatContent.textContent = "";
+
+        messages.forEach((item) => addMessage(item.role, item.content));
+
+        scrollToBottom();
+    }
+
+
+
+    // =========================
+    // 精灵立绘（patchwiki 直链，已验证无防盗链）
+    // =========================
+
+    const PET = {
+        dimo:      "https://patchwiki.biligame.com/images/rocom/thumb/2/2b/sw0puzl5c0n8hu49ryqk7drh1gxtblr.png/180px-JL_dimo.png",
+        miaomiao:  "https://patchwiki.biligame.com/images/rocom/thumb/e/ee/052k5u3hhjgn9m5hzbv2e7bzuqqg6v1.png/180px-JL_miaomiao.png",
+        huohua:    "https://patchwiki.biligame.com/images/rocom/thumb/a/ad/eigi6apueibdqnrkiwio8f60ex532zw.png/180px-JL_huohua.png",
+        shuilanlan:"https://patchwiki.biligame.com/images/rocom/thumb/0/0f/mhbj8o4tgl6mnald2nbbsr4jn39auir.png/180px-JL_shuilanlan.png",
+        molimao:   "https://patchwiki.biligame.com/images/rocom/thumb/b/b0/hco9lbeodwhu0lv8xz0qlpen2p21x2a.png/180px-JL_molimiao.png",
+        huoshen:   "https://patchwiki.biligame.com/images/rocom/thumb/8/84/boqwe6u97r8unsy5mzakw5zkfdbszob.png/180px-JL_huoshen.png",
+        shuiling:  "https://patchwiki.biligame.com/images/rocom/thumb/2/2f/0wqphimotgpcz5rlcauthvx47atrsq0.png/180px-JL_shuiling.png",
+        kula:      "https://patchwiki.biligame.com/images/rocom/thumb/d/d0/c454d79g1zz26le95n44a2dpgslodq2.png/180px-JL_kula.png",
+        maomao:    "https://patchwiki.biligame.com/images/rocom/thumb/e/ea/6hdybi3o9ski2hu1915598mhvs1yo9r.png/180px-JL_maomao.png"
+    };
+
+
+    // =========================
+    // 18 属性配色（与 server/src/data/type_chart.json 一致）
+    // =========================
+
+    const TYPE_COLORS = {
+        "普通": "#9a9a86",
+        "草":   "#57bf62",
+        "火":   "#f97331",
+        "水":   "#3f9ef5",
+        "光":   "#e8b21f",
+        "地":   "#b5813f",
+        "冰":   "#4fbdd2",
+        "龙":   "#7c4ff0",
+        "电":   "#d9b820",
+        "毒":   "#a94ec7",
+        "虫":   "#8fa823",
+        "武":   "#d94a4a",
+        "翼":   "#7f97ee",
+        "萌":   "#f274ab",
+        "幽灵": "#6f5f9c",
+        "恶":   "#6b584f",
+        "机械": "#8593b5",
+        "幻":   "#c264f0"
+    };
+
+    // 长名优先，避免「幽灵」被拆成「幽」
+    const TYPE_NAMES = Object
+        .keys(TYPE_COLORS)
+        .sort((a, b) => b.length - a.length);
+
+    const TYPE_PATTERN = new RegExp(
+        "(" + TYPE_NAMES.join("|") + ")(系)?",
+        "g"
+    );
+
+    const CJK = /[\u4e00-\u9fff]/;
+
+
+    // =========================
+    // 音效（WebAudio 合成，不加载任何音频文件）
+    // =========================
+
+    let audioCtx = null;
+
+    let soundOn = localStorage.getItem("roco-sound") !== "off";
+
+    function playTone(freqList, duration = 0.12, volume = 0.05) {
+
+        if (!soundOn) {
+            return;
+        }
+
+        try {
+
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            freqList.forEach((freq, index) => {
+
+                const start = audioCtx.currentTime + index * duration * 0.75;
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = "triangle";
+                osc.frequency.setValueAtTime(freq, start);
+
+                gain.gain.setValueAtTime(0, start);
+                gain.gain.linearRampToValueAtTime(volume, start + 0.012);
+                gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start(start);
+                osc.stop(start + duration + 0.02);
+            });
+
+        } catch (error) {
+            // 浏览器限制或不支持时静默降级
+        }
+    }
+
+    const sfx = {
+        click:   () => playTone([660], 0.07, 0.035),
+        send:    () => playTone([523, 784], 0.1, 0.05),
+        receive: () => playTone([784, 988, 1319], 0.12, 0.045),
+        error:   () => playTone([320, 220], 0.16, 0.05)
+    };
+
+    function syncSoundButton() {
+
+        soundToggle.textContent = soundOn ? "🔔" : "🔕";
+        soundToggle.classList.toggle("off", !soundOn);
+    }
+
+    soundToggle.addEventListener("click", () => {
+
+        soundOn = !soundOn;
+
+        localStorage.setItem("roco-sound", soundOn ? "on" : "off");
+
+        syncSoundButton();
+
+        if (soundOn) {
+            sfx.click();
+        }
+    });
+
+    syncSoundButton();
+
+
+    // =========================
+    // 主题：日 / 夜
+    // =========================
+
+    function applyTheme(theme) {
+
+        document.documentElement.dataset.theme = theme;
+
+        themeToggle.textContent = theme === "night" ? "☀" : "☾";
+
+        themeToggle.title =
+            theme === "night"
+                ? "切换到清新森林日"
+                : "切换到魔法星空夜";
+
+        localStorage.setItem("roco-theme", theme);
+    }
+
+    applyTheme(localStorage.getItem("roco-theme") || "night");
+
+    themeToggle.addEventListener("click", () => {
+
+        const next =
+            document.documentElement.dataset.theme === "night"
+                ? "day"
+                : "night";
+
+        applyTheme(next);
+
+        sfx.click();
+    });
+
+
+    // =========================
+    // 后端探活（GET /api/health）
+    // =========================
+
+    const STATUS_TEXT = {
+        checking: "正在连接图鉴…",
+        online: "精灵图鉴已就绪 · 375 只精灵 / 494 个技能",
+        offline: "后端未连接"
+    };
+
+    function setStatus(state) {
+
+        statusDot.className = `status-dot ${state}`;
+        statusText.textContent = STATUS_TEXT[state];
+    }
+
+
+    async function probeBackend() {
+
+        const controller = new AbortController();
+
+        const timer = setTimeout(() => controller.abort(), 4000);
+
+        try {
+
+            const res = await fetch(PROBE_URL, {
+                signal: controller.signal
+            });
+
+            const data = await res.json();
+
+            setStatus(res.ok && data.success === true ? "online" : "offline");
+
+        } catch (error) {
+
+            setStatus("offline");
+
+        } finally {
+
+            clearTimeout(timer);
+        }
+    }
+
+    probeBackend();
+
+    setInterval(probeBackend, 20000);
+
+
+    // =========================
+    // 属性徽章渲染
+    //
+    // 只在两种情况下高亮，避免把「火焰」「普通攻击」误判成属性：
+    //   1. 「X系」形式，如 火系 / 幽灵系
+    //   2. 裸属性名，且左右都不是汉字（如「属性：火」「火 → 草 2倍」）
+    // =========================
+
+    function appendHighlighted(container, text) {
+
+        let lastIndex = 0;
+
+        TYPE_PATTERN.lastIndex = 0;
+
+        let match;
+
+        while ((match = TYPE_PATTERN.exec(text)) !== null) {
+
+            const whole = match[0];
+            const typeName = match[1];
+            const hasSuffix = Boolean(match[2]);
+            const start = match.index;
+
+            let accept = hasSuffix;
+
+            if (!accept) {
+
+                const before = start > 0 ? text[start - 1] : "";
+                const after = text[start + whole.length] || "";
+
+                accept = !CJK.test(before) && !CJK.test(after);
+            }
+
+            if (!accept) {
+                continue;
+            }
+
+            if (start > lastIndex) {
+                container.appendChild(
+                    document.createTextNode(text.slice(lastIndex, start))
+                );
+            }
+
+            const chip = document.createElement("span");
+
+            chip.className = "type-chip";
+            chip.style.setProperty("--chip", TYPE_COLORS[typeName]);
+            chip.textContent = whole;
+
+            container.appendChild(chip);
+
+            lastIndex = start + whole.length;
+        }
+
+        if (lastIndex < text.length) {
+            container.appendChild(
+                document.createTextNode(text.slice(lastIndex))
+            );
+        }
+    }
+
+
+    // =========================
+    // Markdown 渲染
+    //
+    // 手写而不是引 marked + DOMPurify：这个页面是 file:// 直接打开的单文件，没有构建步骤，
+    // CDN 依赖一旦离线，整个回复就渲染不出来了。
+    //
+    // 全程 createElement + textContent，不碰 innerHTML，所以不存在 XSS 面。
+    // 行内的纯文本段仍然交给 appendHighlighted 处理，属性徽章才能继续生效。
+    // =========================
+
+    const MD_INLINE_SOURCE =
+        "`([^`\\n]+)`" +                        // 行内代码
+        "|\\*\\*([^*]+)\\*\\*" +                // 加粗
+        "|~~([^~]+)~~" +                        // 删除线
+        "|\\*([^*\\n]+)\\*" +                   // 斜体
+        "|\\[([^\\]\\n]+)\\]\\(([^)\\s]+)\\)";  // 链接
+
+
+    const MD_HEADING = /^\s*(#{1,4})\s+(.*)$/;
+    const MD_LIST_ITEM = /^\s*([-*+]|\d+[.)])\s+(.*)$/;
+    const MD_RULE = /^\s*(-{3,}|\*{3,}|_{3,})\s*$/;
+    const MD_FENCE = /^\s*```/;
+    const MD_QUOTE = /^\s*>/;
+
+
+    function safeUrl(url) {
+
+        // 只放行 http/https/mailto，挡掉 javascript: 这类协议
+        return /^(https?:|mailto:)/i.test(url) ? url : "#";
+    }
+
+
+    function renderInline(container, text) {
+
+        // 每次新建正则：renderInline 会递归，共享实例的 lastIndex 会被内层调用打乱
+        const pattern = new RegExp(MD_INLINE_SOURCE, "g");
+
+        let lastIndex = 0;
+        let match;
+
+        while ((match = pattern.exec(text)) !== null) {
+
+            if (match.index > lastIndex) {
+                appendHighlighted(container, text.slice(lastIndex, match.index));
+            }
+
+            if (match[1] !== undefined) {
+
+                const code = document.createElement("code");
+
+                code.textContent = match[1];
+
+                container.appendChild(code);
+
+            } else if (match[2] !== undefined) {
+
+                const strong = document.createElement("strong");
+
+                renderInline(strong, match[2]);
+
+                container.appendChild(strong);
+
+            } else if (match[3] !== undefined) {
+
+                const del = document.createElement("del");
+
+                renderInline(del, match[3]);
+
+                container.appendChild(del);
+
+            } else if (match[4] !== undefined) {
+
+                const em = document.createElement("em");
+
+                renderInline(em, match[4]);
+
+                container.appendChild(em);
+
+            } else {
+
+                const link = document.createElement("a");
+
+                link.textContent = match[5];
+                link.href = safeUrl(match[6]);
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+
+                container.appendChild(link);
+            }
+
+            lastIndex = match.index + match[0].length;
+        }
+
+        if (lastIndex < text.length) {
+            appendHighlighted(container, text.slice(lastIndex));
+        }
+    }
+
+
+    function splitTableRow(line) {
+
+        return line
+            .replace(/^\s*\|/, "")
+            .replace(/\|\s*$/, "")
+            .split("|")
+            .map((cell) => cell.trim());
+    }
+
+
+    // 形如 |----|:---:|---:| 的分隔行
+    function isTableDivider(line) {
+        return line.includes("|") && line.includes("-") && /^[\s|:-]+$/.test(line);
+    }
+
+
+    function alignOf(cell) {
+
+        const head = cell.startsWith(":");
+        const tail = cell.endsWith(":");
+
+        if (head && tail) return "center";
+        if (tail) return "right";
+
+        return "";
+    }
+
+
+    function renderMarkdown(container, text) {
+
+        const lines = text.replace(/\r\n/g, "\n").split("\n");
+
+        let i = 0;
+
+        while (i < lines.length) {
+
+            const line = lines[i];
+
+            if (!line.trim()) {
+                i++;
+                continue;
+            }
+
+            // 围栏代码块
+            if (MD_FENCE.test(line)) {
+
+                const body = [];
+
+                i++;
+
+                while (i < lines.length && !MD_FENCE.test(lines[i])) {
+                    body.push(lines[i]);
+                    i++;
+                }
+
+                i++;   // 跳过收尾的 ```
+
+                const pre = document.createElement("pre");
+                const code = document.createElement("code");
+
+                code.textContent = body.join("\n");
+
+                pre.appendChild(code);
+                container.appendChild(pre);
+
+                continue;
+            }
+
+            // 分隔线
+            if (MD_RULE.test(line)) {
+
+                container.appendChild(document.createElement("hr"));
+
+                i++;
+                continue;
+            }
+
+            // 标题
+            const heading = line.match(MD_HEADING);
+
+            if (heading) {
+
+                const tag = document.createElement("h" + heading[1].length);
+
+                renderInline(tag, heading[2].trim());
+
+                container.appendChild(tag);
+
+                i++;
+                continue;
+            }
+
+            // 表格：本行含 | 且下一行是分隔行
+            if (line.includes("|") && i + 1 < lines.length && isTableDivider(lines[i + 1])) {
+
+                const headCells = splitTableRow(line);
+                const aligns = splitTableRow(lines[i + 1]).map(alignOf);
+
+                i += 2;
+
+                const table = document.createElement("table");
+                const thead = document.createElement("thead");
+                const headRow = document.createElement("tr");
+
+                headCells.forEach((cell, index) => {
+
+                    const th = document.createElement("th");
+
+                    if (aligns[index]) th.style.textAlign = aligns[index];
+
+                    renderInline(th, cell);
+
+                    headRow.appendChild(th);
+                });
+
+                thead.appendChild(headRow);
+                table.appendChild(thead);
+
+                const tbody = document.createElement("tbody");
+
+                while (i < lines.length && lines[i].includes("|")) {
+
+                    const row = document.createElement("tr");
+
+                    splitTableRow(lines[i]).forEach((cell, index) => {
+
+                        const td = document.createElement("td");
+
+                        if (aligns[index]) td.style.textAlign = aligns[index];
+
+                        renderInline(td, cell);
+
+                        row.appendChild(td);
+                    });
+
+                    tbody.appendChild(row);
+
+                    i++;
+                }
+
+                table.appendChild(tbody);
+                container.appendChild(table);
+
+                continue;
+            }
+
+            // 引用
+            if (MD_QUOTE.test(line)) {
+
+                const body = [];
+
+                while (i < lines.length && MD_QUOTE.test(lines[i])) {
+                    body.push(lines[i].replace(/^\s*>\s?/, ""));
+                    i++;
+                }
+
+                const quote = document.createElement("blockquote");
+
+                renderMarkdown(quote, body.join("\n"));
+
+                container.appendChild(quote);
+
+                continue;
+            }
+
+            // 列表
+            if (MD_LIST_ITEM.test(line)) {
+
+                const ordered = /\d/.test(line.match(MD_LIST_ITEM)[1]);
+                const list = document.createElement(ordered ? "ol" : "ul");
+
+                while (i < lines.length) {
+
+                    const current = lines[i].match(MD_LIST_ITEM);
+
+                    // 换了列表类型就交给下一轮，免得有序无序混在一个列表里
+                    if (!current || /\d/.test(current[1]) !== ordered) break;
+
+                    const item = document.createElement("li");
+
+                    renderInline(item, current[2]);
+
+                    i++;
+
+                    // 缩进的续行并进同一个 li
+                    while (i < lines.length
+                        && lines[i].trim()
+                        && /^\s{2,}\S/.test(lines[i])
+                        && !MD_LIST_ITEM.test(lines[i])) {
+
+                        item.appendChild(document.createTextNode(" "));
+
+                        renderInline(item, lines[i].trim());
+
+                        i++;
+                    }
+
+                    list.appendChild(item);
+                }
+
+                container.appendChild(list);
+
+                continue;
+            }
+
+            // 段落：一直收到空行或下一个块级结构
+            const paragraph = [];
+
+            while (i < lines.length
+                && lines[i].trim()
+                && !MD_FENCE.test(lines[i])
+                && !MD_RULE.test(lines[i])
+                && !MD_HEADING.test(lines[i])
+                && !MD_QUOTE.test(lines[i])
+                && !MD_LIST_ITEM.test(lines[i])) {
+
+                paragraph.push(lines[i]);
+                i++;
+            }
+
+            // 兜底：正常不会走到这，但流式渲染每帧都跑，卡死会冻住整个标签页
+            if (!paragraph.length) {
+                paragraph.push(lines[i]);
+                i++;
+            }
+
+            const p = document.createElement("p");
+
+            paragraph.forEach((row, index) => {
+
+                if (index > 0) {
+                    p.appendChild(document.createElement("br"));
+                }
+
+                renderInline(p, row);
+            });
+
+            container.appendChild(p);
+        }
+    }
+
+
+
+    // =========================
+    // 构造消息节点
+    // =========================
+
+    function buildAvatar(role) {
+
+        const avatar = document.createElement("div");
+
+        avatar.className = "message-avatar";
+
+        if (role === "user") {
+
+            avatar.textContent = "洛";
+
+        } else {
+
+            const img = document.createElement("img");
+
+            img.src = PET.dimo;
+            img.alt = "洛克助手";
+
+            img.addEventListener("error", () => {
+                avatar.textContent = "✦";
+            });
+
+            avatar.appendChild(img);
+        }
+
+        return avatar;
+    }
+
+
+    function addMessage(role, content) {
+
+        const welcome = document.querySelector("#welcome");
+
+        if (welcome) {
+            welcome.remove();
+        }
+
+        const message = document.createElement("div");
+
+        message.className = `message ${role}`;
+
+        const body = document.createElement("div");
+
+        body.className = "message-body";
+
+        const roleLabel = document.createElement("div");
+
+        roleLabel.className = "message-role";
+        roleLabel.textContent = role === "user" ? "小洛克" : "洛克助手";
+
+        const contentBox = document.createElement("div");
+
+        contentBox.className = "message-content";
+
+        if (role === "assistant") {
+            renderMarkdown(contentBox, content);
+        } else {
+            contentBox.textContent = content;
+        }
+
+        body.appendChild(roleLabel);
+        body.appendChild(contentBox);
+
+        message.appendChild(buildAvatar(role));
+        message.appendChild(body);
+
+        chatContent.appendChild(message);
+
+        scrollToBottom();
+
+        return message;
+    }
+
+
+    // =========================
+    // 流式消息：边收边渲染
+    //
+    // 每次收到增量都用「全量文本」重渲染 contentBox，而不是追加。
+    // 因为属性徽章的匹配可能被 chunk 切开（「火」和「系」分在两个 chunk），
+    // 增量追加会漏掉徽章。用 rAF 节流，避免逐 token 重建 DOM。
+    // =========================
+
+    function addStreamingMessage() {
+
+        const welcome = document.querySelector("#welcome");
+
+        if (welcome) {
+            welcome.remove();
+        }
+
+        const message = document.createElement("div");
+
+        message.className = "message assistant";
+
+        const body = document.createElement("div");
+
+        body.className = "message-body";
+
+        const roleLabel = document.createElement("div");
+
+        roleLabel.className = "message-role";
+        roleLabel.textContent = "洛克助手";
+
+        const contentBox = document.createElement("div");
+
+        contentBox.className = "message-content";
+
+        body.appendChild(roleLabel);
+        body.appendChild(contentBox);
+
+        message.appendChild(buildAvatar("assistant"));
+        message.appendChild(body);
+
+        chatContent.appendChild(message);
+
+        scrollToBottom();
+
+        let full = "";
+        let pending = false;
+
+        function render() {
+
+            pending = false;
+
+            // 渲染前先判断用户是不是在看历史，避免流式输出把人硬拽到底部
+            const nearBottom =
+                chatContainer.scrollHeight
+                - chatContainer.scrollTop
+                - chatContainer.clientHeight < 80;
+
+            contentBox.textContent = "";
+
+            renderMarkdown(contentBox, full);
+
+            if (nearBottom) {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        }
+
+        return {
+
+            push(text) {
+
+                full += text;
+
+                if (!pending) {
+                    pending = true;
+                    requestAnimationFrame(render);
+                }
+            },
+
+            finish() {
+
+                if (pending) {
+                    render();
+                }
+
+                return full;
+            }
+        };
+    }
+
+
+    // =========================
+    // SSE 单个事件块解析
+    //
+    // 一个块形如：
+    //   event: error
+    //   data: {"message":"..."}
+    // 或：
+    //   data: {"delta":"文本"}
+    // 或：
+    //   data: [DONE]
+    // =========================
+
+    function parseSSE(block) {
+
+        let name = "message";
+        let raw = "";
+
+        for (const line of block.split("\n")) {
+
+            if (line.startsWith("event:")) {
+
+                name = line.slice(6).trim();
+
+            } else if (line.startsWith("data:")) {
+
+                raw += line.slice(5).trim();
+            }
+        }
+
+        if (!raw) {
+            return null;
+        }
+
+        if (raw === "[DONE]") {
+            return { name, done: true, data: null };
+        }
+
+        try {
+            return { name, done: false, data: JSON.parse(raw) };
+        } catch (error) {
+            return null;
+        }
+    }
+
+
+    // =========================
+    // Loading
+    // =========================
+
+    // 工具名 -> 进度文案
+    // 后端 event: progress 里推的是工具的原始名字，这里映射成世界观内的说法，
+    // 不暴露「工具」「子 agent」等内部实现细节。
+    const PROGRESS_TEXT = {
+        // 主 agent 的委托
+        "图鉴查询": "洛克助手正在翻阅图鉴…",
+        "战斗机制": "洛克助手正在推演战斗机制…",
+        "配队推荐": "洛克助手正在编排队伍…",
+
+        // 精灵
+        "洛克王国·世界精灵信息精确查询": "正在查阅精灵档案…",
+        "洛克王国·世界精灵信息条件查询": "正在筛选候选精灵…",
+        "洛克王国·世界精灵信息模糊查询": "正在翻阅图鉴…",
+        "洛克王国·世界精灵进化链模糊查询": "正在追溯进化谱系…",
+
+        // 技能
+        "洛克王国·世界技能效果精确查询": "正在查阅技能详情…",
+        "洛克王国·世界技能信息模糊查询": "正在检索技能…",
+        "洛克王国·世界技能反查精灵": "正在反查可习得该技能的精灵…",
+
+        // 机制与分析
+        "洛克王国·世界克制关系精确查询": "正在推演属性克制…",
+        "洛克王国·世界战斗机制规则": "正在核对战斗手册…",
+        "洛克王国·世界统计数据精确查询": "正在统计图鉴数据…",
+        "洛克王国·世界百度百科模糊查询": "正在查阅百科…",
+        "洛克王国队伍属性覆盖分析": "正在分析队伍攻防覆盖…",
+        "洛克王国体系分析": "正在评估战术体系适配…",
+    };
+
+
+    // 更新 loading 的文案。loading 已被移除时静默跳过。
+    function updateLoading(tool) {
+
+        const label = document.getElementById("loadingRole");
+
+        if (!label || !tool) {
+            return;
+        }
+
+        label.textContent = PROGRESS_TEXT[tool] || "正在查询资料…";
+    }
+
+
+    function addLoading() {
+
+        const message = document.createElement("div");
+
+        message.className = "message assistant";
+        message.id = "loadingMessage";
+
+        const body = document.createElement("div");
+
+        body.className = "message-body";
+
+        const roleLabel = document.createElement("div");
+
+        roleLabel.className = "message-role";
+        roleLabel.id = "loadingRole";
+        roleLabel.textContent = "洛克助手正在翻阅图鉴…";
+
+        const typing = document.createElement("div");
+
+        typing.className = "typing";
+
+        for (let i = 0; i < 3; i++) {
+            typing.appendChild(document.createElement("span"));
+        }
+
+        body.appendChild(roleLabel);
+        body.appendChild(typing);
+
+        message.appendChild(buildAvatar("assistant"));
+        message.appendChild(body);
+
+        chatContent.appendChild(message);
+
+        scrollToBottom();
+    }
+
+
+    function removeLoading() {
+
+        const loadingMessage = document.querySelector("#loadingMessage");
+
+        if (loadingMessage) {
+            loadingMessage.remove();
+        }
+    }
+
+
+    // =========================
+    // Scroll
+    // =========================
+
+    function scrollToBottom() {
+
+        requestAnimationFrame(() => {
+
+            chatContainer.scrollTo({
+                top: chatContainer.scrollHeight,
+                behavior: "smooth"
+            });
+
+        });
+    }
+
+
+    // =========================
+    // 欢迎屏
+    // =========================
+
+    const SUGGESTIONS = [
+        {
+            pet: PET.huohua,
+            text: "火系打冰系是几倍伤害？顺便说说火系怕什么"
+        },
+        {
+            pet: PET.miaomiao,
+            text: "喵喵的进化链是什么样的？"
+        },
+        {
+            pet: PET.kula,
+            text: "技能「十万伏特」有什么效果？"
+        },
+        {
+            pet: PET.maomao,
+            text: "游戏里一共有多少只精灵？各属性分别有几只？"
+        }
+    ];
+
+
+    function renderWelcome() {
+
+        chatContent.textContent = "";
+
+        const welcome = document.createElement("div");
+
+        welcome.className = "welcome";
+        welcome.id = "welcome";
+
+        // 精灵合影
+        const hero = document.createElement("div");
+
+        hero.className = "hero";
+
+        [
+            { src: PET.shuiling, cls: "pet-side pet-left", alt: "水灵" },
+            { src: PET.dimo,     cls: "pet-main",          alt: "迪莫" },
+            { src: PET.huoshen,  cls: "pet-side pet-right", alt: "火神" }
+        ].forEach((pet) => {
+
+            const img = document.createElement("img");
+
+            img.src = pet.src;
+            img.alt = pet.alt;
+            img.className = pet.cls;
+
+            img.addEventListener("error", () => {
+                img.style.display = "none";
+            });
+
+            hero.appendChild(img);
+        });
+
+        welcome.appendChild(hero);
+
+        // 标题
+        const title = document.createElement("h1");
+
+        title.innerHTML = '欢迎回到<em>洛克王国</em>，小洛克！';
+
+        welcome.appendChild(title);
+
+        const desc = document.createElement("p");
+
+        desc.textContent =
+            "我是洛克助手，随身的精灵图鉴。属性克制、技能效果、进化链、" +
+            "种族值、图鉴统计——想知道什么，直接问我。";
+
+        welcome.appendChild(desc);
+
+        // 属性图例
+        const legend = document.createElement("div");
+
+        legend.className = "type-legend";
+
+        const legendTitle = document.createElement("div");
+
+        legendTitle.className = "type-legend-title";
+        legendTitle.textContent = "18 种属性 · 点击查看克制关系";
+
+        legend.appendChild(legendTitle);
+
+        Object.keys(TYPE_COLORS).forEach((typeName) => {
+
+            const chip = document.createElement("button");
+
+            chip.type = "button";
+            chip.className = "type-chip";
+            chip.style.setProperty("--chip", TYPE_COLORS[typeName]);
+            chip.textContent = typeName;
+
+            chip.addEventListener("click", () => {
+
+                fillInput(`${typeName}系的属性克制关系是怎样的？`);
+
+                sfx.click();
+            });
+
+            legend.appendChild(chip);
+        });
+
+        welcome.appendChild(legend);
+
+        // 建议卡片
+        const suggestions = document.createElement("div");
+
+        suggestions.className = "suggestions";
+
+        SUGGESTIONS.forEach((item) => {
+
+            const card = document.createElement("button");
+
+            card.type = "button";
+            card.className = "suggestion";
+
+            const img = document.createElement("img");
+
+            img.src = item.pet;
+            img.alt = "";
+
+            img.addEventListener("error", () => {
+                img.style.display = "none";
+            });
+
+            const label = document.createElement("span");
+
+            label.textContent = item.text;
+
+            card.appendChild(img);
+            card.appendChild(label);
+
+            card.addEventListener("click", () => {
+
+                fillInput(item.text);
+
+                sfx.click();
+            });
+
+            suggestions.appendChild(card);
+        });
+
+        welcome.appendChild(suggestions);
+
+        chatContent.appendChild(welcome);
+    }
+
+
+    function fillInput(text) {
+
+        input.value = text;
+
+        autoResize();
+
+        input.focus();
+    }
+
+
+    // =========================
+    // Send
+    // =========================
+
+    async function sendMessage() {
+
+        if (loading) {
+            return;
+        }
+
+        const message = input.value.trim();
+
+        if (!message) {
+            return;
+        }
+
+        addMessage("user", message);
+
+        sfx.send();
+
+        input.value = "";
+        autoResize();
+
+        // 整轮对话都锁定在这个 thread 上，避免中途切换会话导致串台
+        const thread = ensureThread();
+        const threadId = thread.id;
+
+        recordMessage("user", message, threadId);
+
+        loading = true;
+        sendButton.disabled = true;
+
+        addLoading();
+
+        // 收到第一个增量才创建气泡，在那之前一直显示 loading
+        let streamMessage = null;
+        let errorText = "";
+        let finalText = "";
+
+        try {
+
+            const res = await fetch(API_URL, {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    message,
+                    user_id: userId,
+                    thread_id: threadId
+                })
+            });
+
+
+            // 流还没开始就失败时，后端返回的是 JSON
+            if (!res.ok) {
+
+                let detail = `HTTP ${res.status}`;
+
+                try {
+                    const body = await res.json();
+                    detail = body.message || detail;
+                } catch (parseError) {
+                    // 响应体不是 JSON，保留 HTTP 状态码
+                }
+
+                throw new Error(detail);
+            }
+
+            const reader = res.body.getReader();
+            const decoder = new TextDecoder();
+
+            let buffer = "";
+            let finished = false;
+
+            while (!finished) {
+
+                const { value, done } = await reader.read();
+
+                if (done) {
+                    break;
+                }
+
+                buffer += decoder.decode(value, { stream: true });
+
+                // 事件之间以空行分隔；末尾那段可能不完整，留在 buffer 里等下一次读取
+                const blocks = buffer.split("\n\n");
+
+                buffer = blocks.pop();
+
+                for (const block of blocks) {
+
+                    const event = parseSSE(block);
+
+                    if (!event) {
+                        continue;
+                    }
+
+                    if (event.name === "error") {
+
+                        errorText = (event.data && event.data.message) || "服务出错了";
+
+                        finished = true;
+                        break;
+                    }
+
+                    if (event.done) {
+                        finished = true;
+                        break;
+                    }
+
+                    // 进度事件：只更新 loading 文案，不产生正文
+                    // 必须放在 delta 判断之前，否则会被 if (!delta) continue 吃掉
+                    if (event.name === "progress") {
+                        updateLoading(event.data && event.data.tool);
+                        continue;
+                    }
+
+                    const delta = event.data && event.data.delta;
+
+                    if (!delta) {
+                        continue;
+                    }
+
+                    if (!streamMessage) {
+                        removeLoading();
+                        streamMessage = addStreamingMessage();
+                        sfx.receive();
+                    }
+
+                    streamMessage.push(delta);
+                }
+            }
+
+            removeLoading();
+
+            // 先取干净正文，再追加中断提示，避免前端提示文案被写进历史
+            if (streamMessage) {
+                finalText = streamMessage.finish();
+            }
+
+            if (errorText) {
+
+                if (streamMessage) {
+                    streamMessage.push("\n\n（中断：" + errorText + "）");
+                    streamMessage.finish();
+                } else {
+                    addMessage("assistant", "哎呀，图鉴翻到一半卡住了（" + errorText + "）。");
+                }
+
+
+                setStatus("offline");
+
+                sfx.error();
+
+            } else if (!streamMessage) {
+
+                addMessage("assistant", "图鉴翻开了，但这一页是空的（没有收到任何内容）。");
+
+                setStatus("online");
+
+            } else {
+
+                setStatus("online");
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+            removeLoading();
+
+            if (streamMessage) {
+
+                finalText = streamMessage.finish();
+
+                streamMessage.push("\n\n（连接中断）");
+                streamMessage.finish();
+
+            } else {
+
+                addMessage(
+                    "assistant",
+                    "哎呀，图鉴一时没能翻开（" + error.message + "）。确认后端 " +
+                    "http://127.0.0.1:3000 已经启动，然后再试一次吧。"
+                );
+            }
+
+            setStatus("offline");
+
+            sfx.error();
+
+        } finally {
+
+            // 只落盘模型真实输出，前端提示文案不写入历史
+            if (finalText) {
+                recordMessage("assistant", finalText, threadId);
+            }
+
+            loading = false;
+            sendButton.disabled = false;
+
+            input.focus();
+        }
+    }
+
+
+
+    sendButton.addEventListener("click", sendMessage);
+
+
+    input.addEventListener("keydown", (event) => {
+
+        if (event.key === "Enter" && !event.shiftKey) {
+
+            event.preventDefault();
+
+            sendMessage();
+        }
+
+    });
+
+
+    // =========================
+    // Auto resize
+    // =========================
+
+    function autoResize() {
+
+        input.style.height = "auto";
+
+        input.style.height =
+            Math.min(input.scrollHeight, 170) + "px";
+    }
+
+    input.addEventListener("input", autoResize);
+
+
+    // =========================
+    // 新的冒险
+    // =========================
+
+    newChat.addEventListener("click", () => {
+
+        if (loading) {
+            return;
+        }
+
+        // 当前会话还是空的就复用，避免点一次多出一条空记录
+        if (!getMessages(currentThreadId).length) {
+            ensureThread();
+        } else {
+            createThread();
+        }
+
+        renderConversations();
+        renderWelcome();
+
+        input.value = "";
+
+        autoResize();
+
+        input.focus();
+
+        sfx.click();
+    });
+
+
+    // 首屏
+    userInfo.title = "user_id: " + userId;
+
+    ensureThread();
+    renderConversations();
+    renderThread();
+
+
+</script>
+
+</body>
+
+</html>
