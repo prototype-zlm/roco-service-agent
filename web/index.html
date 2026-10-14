@@ -1385,6 +1385,15 @@
                     ☀
                 </button>
 
+                <button
+                    class="icon-button"
+                    id="calcButton"
+                    title="PVP 计算器"
+                    aria-label="PVP 计算器"
+                >
+                    ⚔
+                </button>
+
             </div>
 
         </header>
@@ -1452,6 +1461,7 @@
     const API_URL = "http://127.0.0.1:3000/api/chat";
     const PROBE_URL = "http://127.0.0.1:3000/api/health";
     const DELETE_URL = "http://127.0.0.1:3000/api/delete_messages";
+    const TITLE_URL = "http://127.0.0.1:3000/api/generate_title";
 
     const input = document.querySelector("#input");
     const sendButton = document.querySelector("#sendButton");
@@ -1594,9 +1604,10 @@
 
             thread.updatedAt = Date.now();
 
-            // 首条用户提问作为会话标题
-            if (role === "user" && messages.length === 1) {
+            // 首条用户提问先截断占位作为标题，同时异步请求 AI 生成标题
+            if (role === "user" && messages.length === 1 && !thread.aiTitle) {
                 thread.title = titleFromMessage(content);
+                generateAITitle(thread, content);
             }
 
             persistThreads();
@@ -1610,6 +1621,48 @@
         const clean = text.replace(/\s+/g, " ").trim();
 
         return clean.length > 18 ? clean.slice(0, 18) + "…" : clean;
+    }
+
+
+    // AI 生成会话标题：成功后替换占位标题并打上标记，防止重复生成
+    async function generateAITitle(thread, content) {
+
+        try {
+
+            const res = await fetch(TITLE_URL, {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    message: content
+                })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok || !data || data.success !== true || !data.title) {
+                throw new Error((data && data.message) || `HTTP ${res.status}`);
+            }
+
+            // 生成期间用户可能已删除该会话
+            if (!threads.includes(thread)) {
+                return;
+            }
+
+            thread.title = data.title;
+            thread.aiTitle = true;
+
+            persistThreads();
+            renderConversations();
+
+        } catch (error) {
+
+            console.warn("AI 标题生成失败，保留本地截断标题", error);
+        }
     }
 
 
@@ -1963,6 +2016,17 @@
     });
 
     syncSoundButton();
+
+
+    // =========================
+    // PVP 计算器：新标签页打开
+    // =========================
+
+    const calcButton = document.querySelector("#calcButton");
+
+    calcButton.addEventListener("click", () => {
+        window.open("calculator.html", "_blank", "noopener");
+    });
 
 
     // =========================

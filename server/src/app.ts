@@ -5,6 +5,7 @@ import { Request,Response,NextFunction } from "express"
 import chatRouter from "./routes/chat"
 import healthRouter from "./routes/health"
 import messageRouter from "./routes/messages"
+import { AppError } from "./utils/AppError"
 
 const app = express()
 
@@ -17,8 +18,8 @@ app.use("/api", messageRouter)
 
 app.use((err:Error,req:Request,res:Response,next:NextFunction)=>{
   console.error(err)
-
-  res.status(500).json({
+  const statusCode = (err as AppError).statusCode || 500
+  res.status(statusCode).json({
     success: false,
     message: err.message,
   })

@@ -39,7 +39,6 @@ export const systemPromptMain = `
   `
 
 
-
 //战斗agent系统提示词
 export const systemPromptBattle = `
 你是一个战斗agent，由主agent来委托你完成任务。
