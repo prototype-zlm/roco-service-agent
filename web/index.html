@@ -1458,10 +1458,10 @@
 
 <script>
 
-    const API_URL = "http://127.0.0.1:3000/api/chat";
-    const PROBE_URL = "http://127.0.0.1:3000/api/health";
-    const DELETE_URL = "http://127.0.0.1:3000/api/delete_messages";
-    const TITLE_URL = "http://127.0.0.1:3000/api/generate_title";
+    const API_URL = "/api/chat";
+    const PROBE_URL = "/api/health";
+    const DELETE_URL = "/api/delete_messages";
+    const TITLE_URL = "/api/generate_title";
 
     const input = document.querySelector("#input");
     const sendButton = document.querySelector("#sendButton");
@@ -3183,8 +3183,7 @@
 
                 addMessage(
                     "assistant",
-                    "哎呀，图鉴一时没能翻开（" + error.message + "）。确认后端 " +
-                    "http://127.0.0.1:3000 已经启动，然后再试一次吧。"
+                    "哎呀，图鉴一时没能翻开（" + error.message + "）。确认后端服务是否已经启动，然后再试一次吧。"
                 );
             }
 

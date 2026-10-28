@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "concurrently -n API,CHROMA \"tsx src/index.ts\" \".venv\\Scripts\\chroma.exe run --host 0.0.0.0 --port 8000 --path ./chroma-data\"",
+    "start": "tsx src/index.ts",
     "script": "tsx src/script/addEmbeddings.ts"
   },
   "keywords": [],

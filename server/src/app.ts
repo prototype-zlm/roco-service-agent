@@ -1,5 +1,7 @@
 import express from "express"
 import cors from "cors"
+import path from "node:path"
+import { fileURLToPath } from "node:url"
 import { Request,Response,NextFunction } from "express"
 
 import chatRouter from "./routes/chat"
@@ -11,6 +13,9 @@ const app = express()
 
 app.use(cors())
 app.use(express.json())
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+app.use(express.static(path.resolve(__dirname, "../../web")))
 
 app.use("/api", chatRouter)
 app.use("/api", healthRouter)

@@ -5,3 +5,4 @@ checkpoints.sqlite-shm
 checkpoints.sqlite-wal
 .venv/
 .env
+deploy.txt
